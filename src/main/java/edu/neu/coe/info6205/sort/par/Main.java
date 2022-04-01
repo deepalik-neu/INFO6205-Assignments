@@ -15,15 +15,20 @@ import java.util.concurrent.ForkJoinPool;
  * TODO tidy it up a bit.
  */
 public class Main {
+    static int thread= 32;
+    static int arraySize= 4000000;
 
+    static ForkJoinPool myThreadPool =new ForkJoinPool(thread);
     public static void main(String[] args) {
-        processArgs(args);
-        System.out.println("Degree of parallelism: " + ForkJoinPool.getCommonPoolParallelism());
+
+        System.out.println("Degree of parallelism:  " + myThreadPool.getParallelism());
+        System.out.println("Array Size is  "+arraySize);
         Random random = new Random();
-        int[] array = new int[2000000];
+        int[] array = new int[arraySize];
         ArrayList<Long> timeList = new ArrayList<>();
-        for (int j = 50; j < 100; j++) {
-            ParSort.cutoff = 10000 * (j + 1);
+
+        for (int j = 10; j <= 100; j=j+10) {
+            ParSort.cutoff = arraySize/100 *j;
             // for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
             long time;
             long startTime = System.currentTimeMillis();
@@ -34,9 +39,9 @@ public class Main {
             long endTime = System.currentTimeMillis();
             time = (endTime - startTime);
             timeList.add(time);
+            //  System.out.println("No.of threads: "+myPool.getActiveThreadCount());
 
-
-            System.out.println("cutoff：" + (ParSort.cutoff) + "\t\t10times Time:" + time + "ms");
+            System.out.println("cutoff：" + (ParSort.cutoff) + "\t\t10times:" + time + " ms");
 
         }
         try {
@@ -45,7 +50,7 @@ public class Main {
             BufferedWriter bw = new BufferedWriter(isr);
             int j = 0;
             for (long i : timeList) {
-                String content = (double) 10000 * (j + 1) / 2000000 + "," + (double) i / 10 + "\n";
+                String content = (double) 10000 * (j + 1) / arraySize + "," + (double) i / 10 + "\n";
                 j++;
                 bw.write(content);
                 bw.flush();
@@ -55,6 +60,7 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     private static void processArgs(String[] args) {
